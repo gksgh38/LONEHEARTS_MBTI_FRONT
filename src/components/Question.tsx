@@ -50,8 +50,8 @@ const Question: React.FC<QuestionProps> = ({ question, answerValue, onAnswerChan
           gap: 64,
           position: 'relative',
         }}>
-          {[1, 2, 3, 4, 5].map((value, index) => {
-            // 가운데(3번)가 가장 작고, 양끝(1,5)이 가장 큼
+          {[5, 4, 3, 2, 1].map((value, index) => {
+            // 가운데(3번)가 가장 작고, 양끝(5,1)이 가장 큼
             const sizeArr = [64, 44, 28, 44, 64];
             const size = sizeArr[index];
             return (

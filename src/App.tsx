@@ -11,19 +11,22 @@ import ResultPage from './pages/ResultPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
+import AdminPage from './pages/AdminPage.tsx';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 // 로그인 상태 Context 생성
 export const UserContext = createContext<{
-  user: { username: string } | null;
-  setUser: React.Dispatch<React.SetStateAction<{ username: string } | null>>;
+  user: { username: string; isAdmin?: boolean } | null;
+  setUser: React.Dispatch<React.SetStateAction<{ username: string; isAdmin?: boolean } | null>>;
 }>({ user: null, setUser: () => {} });
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ username: string; isAdmin?: boolean } | null>(null);
 
   // 앱 시작 시 세션 확인
   useEffect(() => {
-    fetch('/api/session')
+    fetch(`${API_URL}/api/session`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.loggedIn) setUser(data.user);
@@ -44,6 +47,7 @@ const App: React.FC = () => {
           <Route path="/result/:resultType" element={<ResultPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

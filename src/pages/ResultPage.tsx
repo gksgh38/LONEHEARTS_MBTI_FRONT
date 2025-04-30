@@ -1,101 +1,107 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-// 결과 상세 정보 구조 정의 (백엔드에서 가져오거나 미리 정의됨)
-interface ResultDetails {
-    title: string; // 예: "연예인"
-    typeCode: string; // 예: "ESFP-T"
-    description: string; // 더 긴 설명 (사용 가능한 경우)
-    keywords: string[]; // 예: ["#논리중심", "#긍정감각"]
-    imageUrl?: string; // 디자인 기반의 선택적 이미지 URL
+interface KmbtiResult {
+  type_code: string;
+  type_name: string;
+  result_json: string | KmbtiResultJson;
+}
+
+interface KmbtiResultJson {
+  summary: string;
+  keywords: string[];
+  traits: { name: string; type: string; percent: number; desc: string }[];
+  strengths: string[];
+  watchouts: string[];
+  relation_advice: { summary: string; guides: string[] };
+  relation_style: { summary: string; styles: string[] };
+  activity: { summary: string; activities: string[] };
 }
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 const ResultPage: React.FC = () => {
-  const { resultType } = useParams<{ resultType: string }>(); // URL에서 유형 가져오기
-  const [resultDetails, setResultDetails] = useState<ResultDetails | null>(null);
+  const { resultType } = useParams<{ resultType: string }>();
+  const [result, setResult] = useState<KmbtiResult | null>(null);
+  const [parsed, setParsed] = useState<KmbtiResultJson | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchResultDetails = async () => {
+    const fetchResult = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_URL}/api/results/${resultType}`);
+        const response = await fetch(`${API_URL}/api/kmbti-results/${resultType}`);
         if (!response.ok) throw new Error('결과를 찾을 수 없습니다');
-        const data: ResultDetails = await response.json();
-        setResultDetails(data);
+        const data: KmbtiResult = await response.json();
+        setResult(data);
+        // result_json이 string이면 파싱
+        let parsedJson: KmbtiResultJson | null = null;
+        if (typeof data.result_json === 'string') {
+          parsedJson = JSON.parse(data.result_json);
+        } else {
+          parsedJson = data.result_json;
+        }
+        setParsed(parsedJson);
       } catch (err) {
         setError(err instanceof Error ? err.message : '결과 정보를 불러오는 데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
-
     if (resultType) {
-      fetchResultDetails();
+      fetchResult();
     } else {
       setError('결과 유형이 지정되지 않았습니다.');
       setLoading(false);
     }
-  }, [resultType]); // resultType이 변경되면 다시 가져오기
+  }, [resultType]);
 
-  if (loading) {
-    return <div>결과를 불러오는 중...</div>;
-  }
-
-  if (error) {
-    return <div style={{ color: 'red' }}>오류: {error}</div>;
-  }
-
-  if (!resultDetails) {
-    return <div>결과 정보를 표시할 수 없습니다.</div>;
-  }
-
-  // 이미지 기반 기본 스타일링
-  const resultStyle: React.CSSProperties = {
-      backgroundColor: '#FFD700', // 예시 노란색 배경
-      padding: '40px 20px',
-      textAlign: 'center',
-      borderRadius: '8px',
-      maxWidth: '800px',
-      margin: '40px auto' // 결과 블록 가운데 정렬
-  };
-
-  const keywordStyle: React.CSSProperties = {
-      display: 'inline-block',
-      margin: '5px',
-      padding: '5px 10px',
-      backgroundColor: 'rgba(255, 255, 255, 0.3)', // 반투명 흰색
-      borderRadius: '15px',
-      fontSize: '0.9em'
-  };
+  if (loading) return <div>결과를 불러오는 중...</div>;
+  if (error) return <div style={{ color: 'red' }}>오류: {error}</div>;
+  if (!result || !parsed) return <div>결과 정보를 표시할 수 없습니다.</div>;
 
   return (
-    <div style={resultStyle}>
-      <p style={{ color: '#fff' }}>여러분의 성격 유형:</p>
-      <h1 style={{ fontSize: '3em', margin: '10px 0', color: '#fff' }}>{resultDetails.title}</h1>
-      <h2 style={{ fontSize: '1.5em', margin: '5px 0', color: '#555' }}>{resultDetails.typeCode}</h2>
-      <div>
-        {resultDetails.keywords.map(keyword => (
-          <span key={keyword} style={keywordStyle}>{keyword}</span>
+    <div style={{ backgroundColor: '#FFD700', padding: '40px 20px', textAlign: 'center', borderRadius: '8px', maxWidth: '800px', margin: '40px auto' }}>
+      <h1 style={{ fontSize: '2.5em', margin: '10px 0', color: '#fff' }}>{result.type_name}</h1>
+      <h2 style={{ fontSize: '1.3em', margin: '5px 0', color: '#555' }}>{result.type_code}</h2>
+      <div style={{ margin: '18px 0' }}>
+        {parsed.keywords.map(keyword => (
+          <span key={keyword} style={{ display: 'inline-block', margin: '5px', padding: '5px 10px', backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: '15px', fontSize: '0.9em' }}>#{keyword}</span>
         ))}
       </div>
-      {resultDetails.imageUrl && (
-          <img
-            src={resultDetails.imageUrl}
-            alt={resultDetails.title}
-            style={{ maxWidth: '80%', height: 'auto', marginTop: '30px', borderRadius: '8px' }}
-          />
-      )}
-      <p style={{ marginTop: '20px', textAlign: 'left', color: '#333' }}>
-        {resultDetails.description}
-      </p>
-      {/* 필요한 경우 공유, 테스트 다시하기 등 버튼 추가 */}
-      <div style={{ marginTop: 32, color: '#888', fontSize: '1.1em' }}>
-        (현재실제분석로직X)
+      <p style={{ margin: '18px 0', fontWeight: 'bold', color: '#333' }}>{parsed.summary}</p>
+      <div style={{ textAlign: 'left', margin: '0 auto', maxWidth: 600 }}>
+        <h3>주요 특성</h3>
+        <ul>
+          {parsed.traits.map(trait => (
+            <li key={trait.name}><b>{trait.name}</b> ({trait.type}, {trait.percent}%): {trait.desc}</li>
+          ))}
+        </ul>
+        <h3>강점</h3>
+        <ul>
+          {parsed.strengths.map((s, i) => <li key={i}>{s}</li>)}
+        </ul>
+        <h3>주의점</h3>
+        <ul>
+          {parsed.watchouts.map((w, i) => <li key={i}>{w}</li>)}
+        </ul>
+        <h3>관계 팁</h3>
+        <div><b>{parsed.relation_advice.summary}</b></div>
+        <ul>
+          {parsed.relation_advice.guides.map((g, i) => <li key={i}>{g}</li>)}
+        </ul>
+        <h3>어울리는 관계 스타일</h3>
+        <div><b>{parsed.relation_style.summary}</b></div>
+        <ul>
+          {parsed.relation_style.styles.map((s, i) => <li key={i}>{s}</li>)}
+        </ul>
+        <h3>추천 활동</h3>
+        <div><b>{parsed.activity.summary}</b></div>
+        <ul>
+          {parsed.activity.activities.map((a, i) => <li key={i}>{a}</li>)}
+        </ul>
       </div>
     </div>
   );

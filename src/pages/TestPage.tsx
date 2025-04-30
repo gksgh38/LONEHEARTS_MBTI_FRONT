@@ -87,6 +87,15 @@ const TestPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    // 마지막 페이지 전체 답변 체크
+    const allQuestionIds = Array.from({length: totalQuestions}, (_, i) => i + 1);
+    const unanswered = allQuestionIds.some(
+      id => !answers.find(a => a.questionId === id)
+    );
+    if (unanswered) {
+      alert('모든 문항에 답변해 주세요.');
+      return;
+    }
     if (!gender) {
       alert('성별을 선택해주세요.');
       return;
@@ -96,7 +105,7 @@ const TestPage: React.FC = () => {
     console.log('선택된 성별:', gender);
 
     try {
-      const response = await fetch(`${API_URL}/api/mbti/submit`, {
+      const response = await fetch(`${API_URL}/api/kmbti/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +120,7 @@ const TestPage: React.FC = () => {
       const result = await response.json();
       console.log('받은 결과:', result);
 
-      navigate(`/result/${result.mbtiType}`);
+      navigate(`/result/${result.type_code}`);
     } catch (error) {
       console.error("테스트 제출 오류:", error);
       alert('결과 제출 중 오류가 발생했습니다.');

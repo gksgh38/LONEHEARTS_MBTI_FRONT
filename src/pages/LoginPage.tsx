@@ -22,6 +22,7 @@ const LoginPage: React.FC = () => {
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
@@ -29,7 +30,7 @@ const LoginPage: React.FC = () => {
         setError(data.error || '로그인 실패');
         return;
       }
-      setUser({ username: data.username });
+      setUser({ username: data.username, isAdmin: data.isAdmin });
       navigate('/');
     } catch (err) {
       setError('서버 오류가 발생했습니다.');

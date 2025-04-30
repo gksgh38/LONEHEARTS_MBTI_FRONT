@@ -32,6 +32,7 @@ const RegisterPage: FC = () => {
       const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, email, password })
       });
       const data = await res.json();
@@ -53,7 +54,9 @@ const RegisterPage: FC = () => {
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/api/check-username?username=${encodeURIComponent(username)}`);
+      const res = await fetch(`${API_URL}/api/check-username?username=${encodeURIComponent(username)}`, {
+        credentials: 'include'
+      });
       const data = await res.json();
       if (data.exists) {
         setUsernameCheckMsg('이미 사용 중인 닉네임입니다.');

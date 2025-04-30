@@ -2,12 +2,14 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App.tsx';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Navbar: React.FC = () => {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await fetch('/api/logout', { method: 'POST' });
+  const handleLogout = async () => {    
+    await fetch(`${API_URL}/api/logout`, { method: 'POST', credentials: 'include' });
     setUser(null);
     navigate('/login');
   };
@@ -60,7 +62,26 @@ const Navbar: React.FC = () => {
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
         {user ? (
           <>
-            <span style={{ fontWeight: 'bold', color: '#0082CC' }}>{user.username}</span>
+            <span style={{ fontWeight: 'bold', color: '#0082CC' }}>
+              {user.username}
+              {user.isAdmin && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#FF7A5A',
+                    fontWeight: 'bold',
+                    marginLeft: 6,
+                    cursor: 'pointer',
+                    fontSize: '1em',
+                    padding: 0
+                  }}
+                >
+                  (관리자)
+                </button>
+              )}
+            </span>
             <button onClick={handleLogout} style={{
               background: 'none',
               color: 'black',
