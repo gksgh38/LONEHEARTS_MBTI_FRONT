@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar.tsx';
 import Footer from './components/Footer.tsx';
 import CommunityPage from './pages/CommunityPage.tsx';
@@ -23,16 +23,23 @@ export const UserContext = createContext<{
 
 const App: React.FC = () => {
   const [user, setUser] = useState<{ username: string; isAdmin?: boolean } | null>(null);
+  const navigate = useNavigate();
 
   // 앱 시작 시 세션 확인
   useEffect(() => {
     fetch(`${API_URL}/api/session`, { credentials: 'include' })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
       .then(data => {
         if (data.loggedIn) setUser(data.user);
         else setUser(null);
+      })
+      .catch(() => {
+        navigate('/404', { replace: true });
       });
-  }, []);
+  }, [navigate]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

@@ -49,17 +49,46 @@ const Navbar: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  // 모바일 반응형: 세로 정렬 스타일
+  const isMobile = window.innerWidth <= 768;
+  const mobileNavStyle: React.CSSProperties = isMobile ? {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    padding: '16px 16px',
+    height: 'auto',
+    position: 'static',
+    gap: 12
+  } : {};
+  const mobileCenterNavWrapper: React.CSSProperties = isMobile ? {
+    position: 'static',
+    left: 'unset',
+    transform: 'none',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 8,
+    width: '100%',
+    margin: '12px 0'
+  } : {};
+  const mobileRight: React.CSSProperties = isMobile ? {
+    marginLeft: 0,
+    width: '100%',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 8
+  } : {};
+
   return (
-    <nav style={navStyle}>
-      <div>
+    <nav style={{ ...navStyle, ...mobileNavStyle }}>
+      <div style={isMobile ? { width: '100%', marginBottom: 8 } : {}}>
         <Link to="/" style={{ ...linkStyle, fontSize: '1.5em' }} onClick={handleNavClick}>LONEHEARTS.</Link>
       </div>
-      <div style={centerNavWrapper}>
+      <div style={{ ...centerNavWrapper, ...mobileCenterNavWrapper }}>
         <Link to="/community" style={linkStyle} onClick={handleNavClick}>community</Link>
         <Link to="/social" style={linkStyle} onClick={handleNavClick}>social</Link>
         <Link to="/match" style={linkStyle} onClick={handleNavClick}>match</Link>
       </div>
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ marginLeft: isMobile ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 10, ...mobileRight }}>
         {user ? (
           <>
             <span style={{ fontWeight: 'bold', color: '#0082CC' }}>

@@ -10,12 +10,16 @@ const Footer: React.FC = () => {
         left: 0,
         width: '100%',
         backgroundColor: 'white',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100
     };
 
     return (
         <footer style={footerStyle}>
-            <a href="/qa" style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>Q&A</a>
+            <a href="/qa" style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold', display: 'inline-block' }}>Q&A</a>
         </footer>
     );
 };
