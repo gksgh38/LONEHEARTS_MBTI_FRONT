@@ -32,7 +32,7 @@ const ResultPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_URL}/api/kmbti-results/${resultType}`);
+        const response = await fetch(`${API_URL}/api/kmbti-results/${resultType}`, { credentials: 'include' });
         if (!response.ok) throw new Error('결과를 찾을 수 없습니다');
         const data: KmbtiResult = await response.json();
         setResult(data);

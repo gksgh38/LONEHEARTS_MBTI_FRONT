@@ -26,12 +26,11 @@ const TestPage: React.FC = () => {
   const totalQuestions = 60; // 총 질문 수
   const totalPages = Math.ceil(totalQuestions / questionsPerPage);
   const API_URL = process.env.REACT_APP_API_URL;
-
-  // TODO: 백엔드 API에서 질문 가져오기
+  
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/questions?page=${currentPage}&limit=${questionsPerPage}`);
+        const response = await fetch(`${API_URL}/api/questions?page=${currentPage}&limit=${questionsPerPage}`, { credentials: 'include' });
         if (!response.ok) throw new Error('질문을 불러오지 못했습니다.');
         const data = await response.json();
         setQuestions(data.questions);
@@ -110,6 +109,7 @@ const TestPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ answers, gender }),
       });
 
