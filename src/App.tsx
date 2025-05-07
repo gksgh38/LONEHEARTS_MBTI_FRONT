@@ -23,23 +23,30 @@ export const UserContext = createContext<{
 
 const App: React.FC = () => {
   const [user, setUser] = useState<{ username: string; isAdmin?: boolean } | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   // 앱 시작 시 세션 확인
   useEffect(() => {
     fetch(`${API_URL}/api/session`, { credentials: 'include' })
-      .then(res => {
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
-        if (data.loggedIn) setUser(data.user);
-        else setUser(null);
+        if (data.loggedIn) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+          // navigate는 여기서 하지 않고 조건부 렌더링으로 처리
+        }
       })
-      .catch(() => {
-        navigate('/404', { replace: true });
+      .catch((err) => {
+        console.error('세션 확인 실패', err);
+      })
+      .finally(() => {
+        setLoading(false); // ✅ 세션 체크 끝났음
       });
-  }, [navigate]);
+  }, []);
+
+  if (loading) return <div>로딩 중...</div>; // ✅ 아직 세션 체크 중이면 대기
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
