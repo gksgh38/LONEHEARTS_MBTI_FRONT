@@ -7,6 +7,7 @@ const API_URL = (process.env.REACT_APP_API_URL as string) || '';
 interface QuestionData {
   id: number;
   text: string;
+  is_reverse: boolean;
 }
 
 const TABS = [
@@ -41,26 +42,46 @@ const AdminPage = () => {
   interface ScoreDistData {
     kmbti_type_name: string;
     kmbti_code: string;
-    score_A: number;
-    score_B: number;
-    score_C: number;
-    score_D: number;
-    score_E: number;
-    score_F: number;
-    score_G: number;
-    score_H: number;
-    score_I: number;
-    score_J: number;
+    score_A_min: number; score_A_max: number;
+    score_B_min: number; score_B_max: number;
+    score_C_min: number; score_C_max: number;
+    score_D_min: number; score_D_max: number;
+    score_E_min: number; score_E_max: number;
+    score_F_min: number; score_F_max: number;
+    score_G_min: number; score_G_max: number;
+    score_H_min: number; score_H_max: number;
+    score_I_min: number; score_I_max: number;
+    score_J_min: number; score_J_max: number;
   }
-  const [scoreDistList, setScoreDistList] = useState([]);
+  const [scoreDistList, setScoreDistList] = useState([] as ScoreDistData[]);
   const [scoreDistLoading, setScoreDistLoading] = useState(false);
   const [scoreDistError, setScoreDistError] = useState('');
-  const [editingType, setEditingType] = useState(null);
-  const [newScoreDist, setNewScoreDist] = useState({
-    kmbti_type_name: '', kmbti_code: '', score_A: 0, score_B: 0, score_C: 0, score_D: 0, score_E: 0, score_F: 0, score_G: 0, score_H: 0, score_I: 0, score_J: 0
+  const [editingType, setEditingType] = useState<string | null>(null);
+  const [newScoreDist, setNewScoreDist] = useState<ScoreDistData>({
+    kmbti_type_name: '', kmbti_code: '',
+    score_A_min: 0, score_A_max: 0,
+    score_B_min: 0, score_B_max: 0,
+    score_C_min: 0, score_C_max: 0,
+    score_D_min: 0, score_D_max: 0,
+    score_E_min: 0, score_E_max: 0,
+    score_F_min: 0, score_F_max: 0,
+    score_G_min: 0, score_G_max: 0,
+    score_H_min: 0, score_H_max: 0,
+    score_I_min: 0, score_I_max: 0,
+    score_J_min: 0, score_J_max: 0
   });
-  const [editScoreDist, setEditScoreDist] = useState({
-    kmbti_type_name: '', kmbti_code: '', score_A: 0, score_B: 0, score_C: 0, score_D: 0, score_E: 0, score_F: 0, score_G: 0, score_H: 0, score_I: 0, score_J: 0
+  const [editScoreDist, setEditScoreDist] = useState<ScoreDistData>({
+    kmbti_type_name: '', kmbti_code: '',
+    score_A_min: 0, score_A_max: 0,
+    score_B_min: 0, score_B_max: 0,
+    score_C_min: 0, score_C_max: 0,
+    score_D_min: 0, score_D_max: 0,
+    score_E_min: 0, score_E_max: 0,
+    score_F_min: 0, score_F_max: 0,
+    score_G_min: 0, score_G_max: 0,
+    score_H_min: 0, score_H_max: 0,
+    score_I_min: 0, score_I_max: 0,
+    score_J_min: 0, score_J_max: 0
   });
 
   // KMBTI 결과(문구) 관리 상태 및 핸들러
@@ -68,8 +89,8 @@ const AdminPage = () => {
     type_code: string;
     type_name: string;
   }
-  const [resultTypeList, setResultTypeList] = useState<KmbtiResultMeta[]>([]);
-  const [selectedType, setSelectedType] = useState<string>('');
+  const [resultTypeList, setResultTypeList] = useState([] as KmbtiResultMeta[]);
+  const [selectedType, setSelectedType] = useState('');
   const [selectedResult, setSelectedResult] = useState<{ type_code: string; type_name: string; result_json: string } | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
   const [resultError, setResultError] = useState('');
@@ -176,6 +197,9 @@ const AdminPage = () => {
   const handleChange = (id: number, value: string) => {
     setQuestions(prev => prev.map(q => q.id === id ? { ...q, text: value } : q));
   };
+  const handleReverseChange = (id: number, checked: boolean) => {
+    setQuestions(prev => prev.map(q => q.id === id ? { ...q, is_reverse: checked } : q));
+  };
 
   const handleSave = async () => {
     setSaveStatus('saving');
@@ -228,7 +252,7 @@ const AdminPage = () => {
         body: JSON.stringify(newScoreDist)
       });
       if (!res.ok) throw new Error();
-      setNewScoreDist({ kmbti_type_name: '', kmbti_code: '', score_A: 0, score_B: 0, score_C: 0, score_D: 0, score_E: 0, score_F: 0, score_G: 0, score_H: 0, score_I: 0, score_J: 0 });
+      setNewScoreDist({ kmbti_type_name: '', kmbti_code: '', score_A_min: 0, score_A_max: 0, score_B_min: 0, score_B_max: 0, score_C_min: 0, score_C_max: 0, score_D_min: 0, score_D_max: 0, score_E_min: 0, score_E_max: 0, score_F_min: 0, score_F_max: 0, score_G_min: 0, score_G_max: 0, score_H_min: 0, score_H_max: 0, score_I_min: 0, score_I_max: 0, score_J_min: 0, score_J_max: 0 });
       // 새로고침
       const listRes = await fetch(`${API_URL}/api/admin/kmbti-score-distributions`, { credentials: 'include' });
       setScoreDistList(await listRes.json());
@@ -238,8 +262,8 @@ const AdminPage = () => {
   };
 
   // 점수분포 삭제
-  const handleDeleteScoreDist = async (kmbti_type_name: string) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+  const handleDeleteScoreDist = async (kmbti_type_name: string, kmbti_code: string) => {
+    if (!window.confirm(`정말 삭제하시겠습니까? (유형명: ${kmbti_type_name}, 코드: ${kmbti_code})`)) return;
     try {
       const res = await fetch(`${API_URL}/api/admin/kmbti-score-distributions/` + encodeURIComponent(kmbti_type_name), { method: 'DELETE', credentials: 'include' });
       if (!res.ok) throw new Error();
@@ -257,7 +281,7 @@ const AdminPage = () => {
   // 점수분포 수정 취소
   const cancelEditScoreDist = () => {
     setEditingType(null);
-    setEditScoreDist({ kmbti_type_name: '', kmbti_code: '', score_A: 0, score_B: 0, score_C: 0, score_D: 0, score_E: 0, score_F: 0, score_G: 0, score_H: 0, score_I: 0, score_J: 0 });
+    setEditScoreDist({ kmbti_type_name: '', kmbti_code: '', score_A_min: 0, score_A_max: 0, score_B_min: 0, score_B_max: 0, score_C_min: 0, score_C_max: 0, score_D_min: 0, score_D_max: 0, score_E_min: 0, score_E_max: 0, score_F_min: 0, score_F_max: 0, score_G_min: 0, score_G_max: 0, score_H_min: 0, score_H_max: 0, score_I_min: 0, score_I_max: 0, score_J_min: 0, score_J_max: 0 });
   };
   // 점수분포 수정 저장
   const handleSaveEditScoreDist = async (kmbti_type_name: string) => {
@@ -325,8 +349,8 @@ const AdminPage = () => {
         fetchError ? (
           <div style={{ color: 'red', marginTop: 40 }}>문항을 불러오지 못했습니다.</div>
         ) : (
-          <div>
-            <div style={{ maxHeight: 600, overflowY: 'auto', marginBottom: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ maxHeight: 600, overflowY: 'auto', marginBottom: 24, width: '80%' }}>
               {GROUPS.map((group, groupIdx) => {
                 const groupQuestions = questions.slice(groupIdx * 6, groupIdx * 6 + 6);
                 return (
@@ -335,14 +359,23 @@ const AdminPage = () => {
                       {group.key}. {group.name}
                     </div>
                     {groupQuestions.map((q, idx) => (
-                      <div key={q.id} style={{ marginBottom: 18 }}>
+                      <div key={q.id} style={{ marginBottom: 18, display: 'flex', alignItems: 'center' }}>
                         <label style={{ fontWeight: 'bold', marginRight: 12 }}>문항 {group.key}{idx + 1}</label>
                         <input
                           type="text"
                           value={q.text}
                           onChange={e => handleChange(q.id, e.target.value)}
-                          style={{ width: '80%', padding: 8, fontSize: '1em', borderRadius: 6, border: '1px solid #ccc' }}
+                          style={{ width: '70%', padding: 8, fontSize: '1em', borderRadius: 6, border: '1px solid #ccc', marginRight: 12 }}
                         />
+                        <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.98em', marginLeft: 8 }}>
+                          <input
+                            type="checkbox"
+                            checked={q.is_reverse}
+                            onChange={e => handleReverseChange(q.id, e.target.checked)}
+                            style={{ marginRight: 4 }}
+                          />
+                          역채점
+                        </label>
                       </div>
                     ))}
                   </div>
@@ -371,68 +404,65 @@ const AdminPage = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 24, fontSize: '0.97em', textAlign: 'center' }}>
               <thead>
                 <tr style={{ background: '#f8f8f8' }}>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>유형명</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>코드</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>A</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>B</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>C</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>D</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>E</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>F</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>G</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>H</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>I</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>J</th>
-                  <th style={{ border: '1px solid #eee', padding: 6 }}>관리</th>
+                  <th style={{ border: '1px solid #eee', padding: 6, minWidth: 120 }}>유형명</th>
+                  <th style={{ border: '1px solid #eee', padding: 6, minWidth: 90 }}>코드</th>
+                  {['A','B','C','D','E','F','G','H','I','J'].map(key => (
+                    <th key={key} style={{ border: '1px solid #eee', padding: 6 }}>{key}</th>
+                  ))}
+                  <th style={{ border: '1px solid #eee', padding: 6, minWidth: 140 }}>관리</th>
                 </tr>
               </thead>
               <tbody>
                 {scoreDistList.map(c => editingType === c.kmbti_type_name ? (
                   <tr key={c.kmbti_type_name} style={{ background: '#f3faff' }}>
                     <td style={{ border: '1px solid #eee', padding: 6 }}>
-                      <input value={editScoreDist.kmbti_type_name} onChange={e => setEditScoreDist(ec => ({ ...ec, kmbti_type_name: e.target.value }))} style={{ width: 90, textAlign: 'center' }} />
+                      <input value={editScoreDist.kmbti_type_name} onChange={e => setEditScoreDist(ec => ({ ...ec, kmbti_type_name: e.target.value }))} style={{ width: 110, textAlign: 'center' }} />
                     </td>
                     <td style={{ border: '1px solid #eee', padding: 6 }}>
-                      <input value={editScoreDist.kmbti_code} onChange={e => setEditScoreDist(ec => ({ ...ec, kmbti_code: e.target.value }))} style={{ width: 70, textAlign: 'center' }} />
+                      <input value={editScoreDist.kmbti_code} onChange={e => setEditScoreDist(ec => ({ ...ec, kmbti_code: e.target.value }))} style={{ width: 80, textAlign: 'center' }} />
                     </td>
-                    {["A","B","C","D","E","F","G","H","I","J"].map(key => (
+                    {['A','B','C','D','E','F','G','H','I','J'].map(key => (
                       <td key={key} style={{ border: '1px solid #eee', padding: 6 }}>
-                        <input type="number" value={editScoreDist[`score_${key}` as keyof ScoreDistData] as number} onChange={e => setEditScoreDist(ec => ({ ...ec, [`score_${key}`]: Number(e.target.value) }))} style={{ width: 50, textAlign: 'center' }} />
+                        <input type="number" value={editScoreDist[`score_${key}_min` as keyof ScoreDistData] as number} onChange={e => setEditScoreDist(ec => ({ ...ec, [`score_${key}_min`]: Number(e.target.value) }))} style={{ width: 40, textAlign: 'center' }} />
+                        <span style={{ margin: '0 4px' }}>~</span>
+                        <input type="number" value={editScoreDist[`score_${key}_max` as keyof ScoreDistData] as number} onChange={e => setEditScoreDist(ec => ({ ...ec, [`score_${key}_max`]: Number(e.target.value) }))} style={{ width: 40, textAlign: 'center' }} />
                       </td>
                     ))}
-                    <td style={{ border: '1px solid #eee', padding: 6 }}>
-                      <button onClick={() => handleSaveEditScoreDist(c.kmbti_type_name)} style={{ marginRight: 8, padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>저장</button>
-                      <button onClick={cancelEditScoreDist} style={{ padding: '6px 18px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', color: '#0082CC', fontWeight: 'bold', cursor: 'pointer' }}>취소</button>
+                    <td style={{ border: '1px solid #eee', padding: 6, minWidth: 140, display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <button onClick={() => handleSaveEditScoreDist(c.kmbti_type_name)} style={{ padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer', minWidth: 80 }}>저장</button>
+                      <button onClick={cancelEditScoreDist} style={{ padding: '6px 18px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', color: '#0082CC', fontWeight: 'bold', cursor: 'pointer', minWidth: 80 }}>취소</button>
                     </td>
                   </tr>
                 ) : (
                   <tr key={c.kmbti_type_name}>
-                    <td style={{ border: '1px solid #eee', padding: 6 }}>{c.kmbti_type_name}</td>
-                    <td style={{ border: '1px solid #eee', padding: 6 }}>{c.kmbti_code}</td>
-                    {["A","B","C","D","E","F","G","H","I","J"].map(key => (
-                      <td key={key} style={{ border: '1px solid #eee', padding: 6 }}>{c[`score_${key}` as keyof ScoreDistData]}</td>
+                    <td style={{ border: '1px solid #eee', padding: 6, minWidth: 120 }}>{c.kmbti_type_name}</td>
+                    <td style={{ border: '1px solid #eee', padding: 6, minWidth: 90 }}>{c.kmbti_code}</td>
+                    {['A','B','C','D','E','F','G','H','I','J'].map(key => (
+                      <td key={key} style={{ border: '1px solid #eee', padding: 6 }}>{c[`score_${key}_min` as keyof ScoreDistData]} ~ {c[`score_${key}_max` as keyof ScoreDistData]}</td>
                     ))}
-                    <td style={{ border: '1px solid #eee', padding: 6 }}>
-                      <button onClick={() => startEditScoreDist(c)} style={{ marginRight: 8, padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>수정</button>
-                      <button onClick={() => handleDeleteScoreDist(c.kmbti_type_name)} style={{ padding: '6px 18px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', color: '#0082CC', fontWeight: 'bold', cursor: 'pointer' }}>삭제</button>
+                    <td style={{ border: '1px solid #eee', padding: 6, minWidth: 140, display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <button onClick={() => startEditScoreDist(c)} style={{ padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer', minWidth: 80 }}>수정</button>
+                      <button onClick={() => handleDeleteScoreDist(c.kmbti_type_name, c.kmbti_code)} style={{ padding: '6px 18px', borderRadius: 6, border: '1px solid #ccc', background: '#fff', color: '#0082CC', fontWeight: 'bold', cursor: 'pointer', minWidth: 80 }}>삭제</button>
                     </td>
                   </tr>
                 ))}
                 {/* 추가 폼 */}
                 <tr style={{ background: '#f8f8f8' }}>
-                  <td style={{ border: '1px solid #eee', padding: 6 }}>
-                    <input value={newScoreDist.kmbti_type_name} onChange={e => setNewScoreDist(nc => ({ ...nc, kmbti_type_name: e.target.value }))} style={{ width: 90, textAlign: 'center' }} />
+                  <td style={{ border: '1px solid #eee', padding: 6, height: 40 }}>
+                    <input value={newScoreDist.kmbti_type_name} onChange={e => setNewScoreDist(nc => ({ ...nc, kmbti_type_name: e.target.value }))} style={{ width: 110, textAlign: 'center' }} />
                   </td>
-                  <td style={{ border: '1px solid #eee', padding: 6 }}>
-                    <input value={newScoreDist.kmbti_code} onChange={e => setNewScoreDist(nc => ({ ...nc, kmbti_code: e.target.value }))} style={{ width: 70, textAlign: 'center' }} />
+                  <td style={{ border: '1px solid #eee', padding: 6, height: 40 }}>
+                    <input value={newScoreDist.kmbti_code} onChange={e => setNewScoreDist(nc => ({ ...nc, kmbti_code: e.target.value }))} style={{ width: 80, textAlign: 'center' }} />
                   </td>
-                  {["A","B","C","D","E","F","G","H","I","J"].map(key => (
-                    <td key={key} style={{ border: '1px solid #eee', padding: 6 }}>
-                      <input type="number" value={newScoreDist[`score_${key}` as keyof ScoreDistData] as number} onChange={e => setNewScoreDist(nc => ({ ...nc, [`score_${key}`]: Number(e.target.value) }))} style={{ width: 50, textAlign: 'center' }} />
+                  {['A','B','C','D','E','F','G','H','I','J'].map(key => (
+                    <td key={key} style={{ border: '1px solid #eee', padding: 6, height: 40 }}>
+                      <input type="number" value={newScoreDist[`score_${key}_min` as keyof ScoreDistData] as number} onChange={e => setNewScoreDist(nc => ({ ...nc, [`score_${key}_min`]: Number(e.target.value) }))} style={{ width: 40, textAlign: 'center' }} />
+                      <span style={{ margin: '0 4px' }}>~</span>
+                      <input type="number" value={newScoreDist[`score_${key}_max` as keyof ScoreDistData] as number} onChange={e => setNewScoreDist(nc => ({ ...nc, [`score_${key}_max`]: Number(e.target.value) }))} style={{ width: 40, textAlign: 'center' }} />
                     </td>
                   ))}
-                  <td style={{ border: '1px solid #eee', padding: 6 }}>
-                    <button onClick={handleAddScoreDist} style={{ padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer', width: 80 }}>추가</button>
+                  <td style={{ border: '1px solid #eee', padding: 6, minWidth: 140, display: 'flex', justifyContent: 'center', height: 40 }}>
+                    <button onClick={handleAddScoreDist} style={{ padding: '6px 18px', borderRadius: 6, border: 'none', background: '#0082CC', color: '#fff', fontWeight: 'bold', cursor: 'pointer', minWidth: 80 }}>추가</button>
                   </td>
                 </tr>
               </tbody>
