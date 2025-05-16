@@ -20,6 +20,7 @@ const TestPage: React.FC = () => {
   const [answers, setAnswers] = useState<AnswerData[]>([]);
   const [gender, setGender] = useState<string>(''); // 성별 선택 상태
   const [fetchError, setFetchError] = useState<boolean>(false);
+  const [progressPercent, setProgressPercent] = useState(0); // 게이지 진행율 상태 추가
   const navigate = useNavigate();
 
   const questionsPerPage = 6; // 페이지당 6개 질문
@@ -44,6 +45,11 @@ const TestPage: React.FC = () => {
     };
     fetchQuestions();
   }, [currentPage]); // currentPage가 변경될 때 다시 가져오기
+
+  // 페이지 기준이 아닌 답변한 문항 수에 따라 진행률 계산
+  useEffect(() => {
+    setProgressPercent((answers.length / totalQuestions) * 100);
+  }, [answers.length, totalQuestions]);
 
   const handleAnswerChange = (questionId: number, value: number) => {
     setAnswers(prevAnswers => {
@@ -135,13 +141,14 @@ const TestPage: React.FC = () => {
     display: 'flex',
     flexDirection: 'column'
   }}>
-    {/* 타이틀, 안내문 복구 */}
+
     <div style={{ textAlign: 'center', margin: '40px 0 30px 0' }}>
       <h1 style={{ fontSize: '5rem', fontWeight: 'bold', marginBottom: '30px', letterSpacing: '-2px' }}>KMBTI</h1>
       <div style={{ fontSize: '1.35rem', fontWeight: 'bold' }}>
         우리의 문화와 정서에 맞는 질문들로 보다 정확히 자신의 성향을 찾아보세요.
       </div>
     </div>
+
     {fetchError ? (
       <div style={{ color: 'red', margin: '30px 0' }}>
         서버에서 질문을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.
@@ -154,6 +161,7 @@ const TestPage: React.FC = () => {
             <React.Fragment key={q.id}>
               <Question
                 question={q}
+                questionNumber={(currentPage - 1) * questionsPerPage + idx + 1} // 연속적인 문항 번호 전달
                 answerValue={answers.find(a => a.questionId === q.id)?.value}
                 onAnswerChange={handleAnswerChange}
               />
@@ -184,11 +192,47 @@ const TestPage: React.FC = () => {
             </React.Fragment>
           ))}
         </div>
+        
+        <div style={{ maxWidth: 1200, margin: '40px auto 20px', padding: '0 20px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+            <div style={{ color: '#000', marginRight: 10, fontSize: '1.2rem', flexShrink: 0, width: '50px', textAlign: 'right' }}>{Math.round(progressPercent)}%</div>
+            <div style={{ 
+              width: '90%',
+              minWidth: '350px',
+              height: 14,
+              backgroundColor: 'transparent',
+              borderRadius: 0,
+              border: '1px solid #000',
+              overflow: 'hidden',
+              position: 'relative',
+            }}>
+              <div 
+                style={{ 
+                  width: `${progressPercent}%`,
+                  height: '100%', 
+                  backgroundColor: '#0a3dcc', 
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  transition: 'width 0.3s ease',
+                  borderRadius: 0
+                }}
+              />                
+            </div>
+            <div style={{ marginLeft: 10, width: '50px', flexShrink: 0 }}></div>
+          </div>
+        </div>
+
         {/* 네비게이션/결과 버튼 영역 */}
         <div
           className="navigation-buttons"
           style={{
-            marginTop: '40px',
+            marginTop: '30px', // 간격 조정
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

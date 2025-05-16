@@ -64,8 +64,8 @@ const ResultPage: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: '#FFD700', padding: '40px 20px', textAlign: 'center', borderRadius: '8px', maxWidth: '800px', margin: '40px auto' }}>
-      <h1 style={{ fontSize: '2.5em', margin: '10px 0', color: '#fff' }}>{result.type_name}</h1>
-      <h2 style={{ fontSize: '1.3em', margin: '5px 0', color: '#555' }}>{result.type_code}</h2>
+      <h1 style={{ fontSize: '2.5em', margin: '10px 0' }}>{result.type_name}</h1>
+      {/* <h2 style={{ fontSize: '1.3em', margin: '5px 0', color: '#555' }}>{result.type_code}</h2> */}
       <div style={{ margin: '18px 0' }}>
         {parsed.keywords.map(keyword => (
           <span key={keyword} style={{ display: 'inline-block', margin: '5px', padding: '5px 10px', backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: '15px', fontSize: '0.9em' }}>#{keyword}</span>

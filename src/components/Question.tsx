@@ -5,11 +5,12 @@ interface QuestionProps {
     id: number;
     text: string;
   };
+  questionNumber: number; // 문항 번호 추가
   answerValue?: number;
   onAnswerChange: (questionId: number, value: number) => void;
 }
 
-const Question: React.FC<QuestionProps> = ({ question, answerValue, onAnswerChange }) => {
+const Question: React.FC<QuestionProps> = ({ question, questionNumber, answerValue, onAnswerChange }) => {
   // 반응형: 모바일에서 width 100%, gap 축소, 폰트/버튼 크기 축소
   const isMobile = window.innerWidth <= 768;
   const optionGap = isMobile ? 24 : 64;
@@ -35,7 +36,7 @@ const Question: React.FC<QuestionProps> = ({ question, answerValue, onAnswerChan
           maxWidth: '100%'
         }}
       >
-        <strong>{question.text}</strong>
+        <strong>{questionNumber}. {question.text}</strong>
       </p>
       {/* 선택지 UI */}
       <div
