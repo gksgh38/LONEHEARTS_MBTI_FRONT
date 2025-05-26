@@ -19,7 +19,7 @@ interface PostsResponse {
   hasMore: boolean;
 }
 
-const CommunityPage: React.FC = () => {
+const QnAPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -27,12 +27,13 @@ const CommunityPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_API_URL || '';
   const limit = 30; // 페이지당 게시글 수
 
-  // 로그인 상태 확인
+  // 로그인 상태 및 관리자 권한 확인
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -41,9 +42,11 @@ const CommunityPage: React.FC = () => {
         });
         const data = await response.json();
         setIsLoggedIn(data.loggedIn || false);
+        setIsAdmin(data.loggedIn && data.user.isAdmin);
       } catch (error) {
         console.error('로그인 상태 확인 실패:', error);
         setIsLoggedIn(false);
+        setIsAdmin(false);
       }
     };
     
@@ -57,7 +60,7 @@ const CommunityPage: React.FC = () => {
       setError(null);
       
       try {
-        const response = await fetch(`${API_URL}/api/community/posts?page=${currentPage}&limit=${limit}`, {
+        const response = await fetch(`${API_URL}/api/qna/posts?page=${currentPage}&limit=${limit}`, {
           credentials: 'include'
         });
         
@@ -100,7 +103,13 @@ const CommunityPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    navigate('/community/write');
+    
+    if (!isAdmin) {
+      alert('관리자만 글을 작성할 수 있습니다.');
+      return;
+    }
+    
+    navigate('/qna/write');
   };
 
   // 페이지네이션 컴포넌트
@@ -177,7 +186,7 @@ const CommunityPage: React.FC = () => {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px' }}>
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Community</h1>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Q&A</h1>
       </div>
 
       {loading ? (
@@ -212,7 +221,7 @@ const CommunityPage: React.FC = () => {
             position: 'relative',
             margin: '20px 0'
           }}>
-            {isLoggedIn && (
+            {isAdmin && (
               <div style={{ 
                 position: 'absolute',
                 right: 0,
@@ -258,7 +267,7 @@ const CommunityPage: React.FC = () => {
               ) : (
                 posts.map((post) => (
                   <tr key={post.id} style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }} 
-                      onClick={() => navigate(`/community/post/${post.id}`)}>
+                      onClick={() => navigate(`/qna/post/${post.id}`)}>
                     <td style={{ padding: '12px', textAlign: 'center' }}>{post.id}</td>
                     <td style={{ padding: '12px', textAlign: 'left' }}>{post.title}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>{post.author_name}</td>
@@ -281,8 +290,8 @@ const CommunityPage: React.FC = () => {
               </div>
             )}
             
-            {/* 글쓰기 버튼 - 오른쪽 고정 */}
-            {isLoggedIn && (
+            {/* 글쓰기 버튼 - 관리자만 보이게 */}
+            {isAdmin && (
               <div style={{ 
                 position: 'absolute',
                 right: 0,
@@ -312,4 +321,4 @@ const CommunityPage: React.FC = () => {
   );
 };
 
-export default CommunityPage;
+export default QnAPage;

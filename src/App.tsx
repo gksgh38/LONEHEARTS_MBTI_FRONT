@@ -3,15 +3,21 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar.tsx';
 import Footer from './components/Footer.tsx';
 import CommunityPage from './pages/CommunityPage.tsx';
+import CommunityPostPage from './pages/CommunityPostPage.tsx';
+import CommunityWritePage from './pages/CommunityWritePage.tsx';
+import CommunityEditPage from './pages/CommunityEditPage.tsx';
 import SocialPage from './pages/SocialPage.tsx';
 import MatchPage from './pages/MatchPage.tsx';
-import QAPage from './pages/QAPage.tsx';
 import TestPage from './pages/TestPage.tsx';
 import ResultPage from './pages/ResultPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
 import AdminPage from './pages/AdminPage.tsx';
+import QnAPage from './pages/QnAPage.tsx';
+import QnAPostPage from './pages/QnAPostPage.tsx';
+import QnAWritePage from './pages/QnAWritePage.tsx';
+import QnAEditPage from './pages/QnAEditPage.tsx';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -55,13 +61,19 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<TestPage />} />
           <Route path="/community" element={<CommunityPage />} />
+          <Route path="/community/post/:id" element={<CommunityPostPage />} />
+          <Route path="/community/write" element={<CommunityWritePage />} />
+          <Route path="/community/edit/:id" element={<CommunityEditPage />} />
           <Route path="/social" element={<SocialPage />} />
           <Route path="/match" element={<MatchPage />} />
-          <Route path="/qa" element={<QAPage />} />
           <Route path="/result/:resultType" element={<ResultPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/qna" element={<QnAPage />} />
+          <Route path="/qna/post/:id" element={<QnAPostPage />} />
+          <Route path="/qna/write" element={<QnAWritePage />} />
+          <Route path="/qna/edit/:id" element={<QnAEditPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

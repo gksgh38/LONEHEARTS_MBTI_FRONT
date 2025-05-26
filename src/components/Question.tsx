@@ -75,10 +75,10 @@ const Question: React.FC<QuestionProps> = ({ question, questionNumber, answerVal
                   style={{
                     width: size,
                     height: size,
-                    backgroundColor: answerValue === value ? '#28a745' : '#0a3dcc',
+                    backgroundColor: answerValue === value ? '#FF7A5A' : '#0a3dcc',
                     borderRadius: '50%',
                     display: 'inline-block',
-                    border: answerValue === value ? '3px solid #28a745' : '3px solid transparent',
+                    border: answerValue === value ? '3px solid #FF7A5A' : '3px solid transparent',
                     transition: 'background 0.2s, border 0.2s',
                   }}
                 ></span>

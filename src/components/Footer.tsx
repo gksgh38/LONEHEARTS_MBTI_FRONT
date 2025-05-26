@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer style={footerStyle}>
-            <a href="/qa" style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold', display: 'inline-block' }}>Q&A</a>
+            <a href="/qna" style={{ textDecoration: 'none', color: 'black', fontWeight: 'bold', display: 'inline-block' }}>Q&A</a>
         </footer>
     );
 };

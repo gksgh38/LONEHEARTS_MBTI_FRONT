@@ -193,38 +193,13 @@ const TestPage: React.FC = () => {
           ))}
         </div>
         
-        <div style={{ maxWidth: 1200, margin: '40px auto 20px', padding: '0 20px' }}>
+        <div style={{ maxWidth: 1200, margin: '40px auto 20px', padding: '0 20px', textAlign: 'center' }}>
           <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: '100%'
+            fontSize: '1.3rem',
+            fontWeight: 'bold',
+            color: '#000'
           }}>
-            <div style={{ color: '#000', marginRight: 10, fontSize: '1.2rem', flexShrink: 0, width: '50px', textAlign: 'right' }}>{Math.round(progressPercent)}%</div>
-            <div style={{ 
-              width: '90%',
-              minWidth: '350px',
-              height: 14,
-              backgroundColor: 'transparent',
-              borderRadius: 0,
-              border: '1px solid #000',
-              overflow: 'hidden',
-              position: 'relative',
-            }}>
-              <div 
-                style={{ 
-                  width: `${progressPercent}%`,
-                  height: '100%', 
-                  backgroundColor: '#0a3dcc', 
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  transition: 'width 0.3s ease',
-                  borderRadius: 0
-                }}
-              />                
-            </div>
-            <div style={{ marginLeft: 10, width: '50px', flexShrink: 0 }}></div>
+            {Math.round(progressPercent)}%
           </div>
         </div>
 
